@@ -1,33 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Frog Visualization Program</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-        #dropdown {
-            margin: 20px 0;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Frog Visualization Program</title>
+
+  <!-- Optional: use your existing CSS file -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- p5.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
 </head>
 <body>
-    <h1>Frog Visualization Program</h1>
-    <label for="dropdown">Select a frog:</label>
-    <select id="dropdown">
-        <option value="frog1">Frog 1</option>
-        <option value="frog2">Frog 2</option>
-        <option value="frog3">Frog 3</option>
-    </select>
-    <div id="visualization">
-        <!-- Visualization will be rendered here -->
-    </div>
-    <script>
-        // JavaScript for handling dropdown changes and visualization rendering
-    </script>
+  <h1>Frog Visualization Program</h1>
+
+  <label for="dropdown">Select a frog:</label>
+  <select id="dropdown">
+    <option value="">Loading frogs…</option>
+  </select>
+
+  <div id="canvas-holder"></div>
+
+  <!-- your sketch -->
+  <script src="sketch.js"></script>
 </body>
 </html>
