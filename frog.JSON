@@ -12,6 +12,7 @@
         "Toe color": "#87bbeb",
         "Eye color": "#0a0b12",
         "Iris color": "#ffffff",
+        "Spot color": "#000000",
         "Diet": "Insects and small invertebrates",
         "Size": "1.5 - 6 cm"
     },
@@ -60,6 +61,7 @@
         "Toe color": "#99775b55",
         "Eye color": "#a3a04385",
         "Iris color": "#040507",
+        "Spot color": "#e6f04f",
         "Diet": "Insects",
         "Size": "2 - 3 cm"
     },
@@ -76,6 +78,7 @@
         "Toe color": "#a8c11f35",
         "Eye color": "#e1cd2e",
         "Iris color": "#060b07",
+        "Spot color": "#000000",
         "Diet": "Insects",
         "Size": "2.1 - 3.1 cm"
     },
@@ -140,6 +143,7 @@
         "Toe color": "#96847a",
         "Eye color": "#dad5c1",
         "Iris color": "#120d13",
+        "Line color": "#241d0b",
         "Diet": "Insects, small rodents, birds, reptiles, and other amphibians",
         "Size": "11.4 - 25 cm"
     },
