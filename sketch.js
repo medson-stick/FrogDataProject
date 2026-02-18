@@ -22,7 +22,7 @@ function preload() {
 }
 
 function setup() {
-  const canvas = createCanvas(800, 600);
+  const canvas = createCanvas(windowWidth, windowWidth);
   canvas.parent("visualization");
 
   // Normalize JSON to array
@@ -34,7 +34,7 @@ function setup() {
 }
 
 function draw() {
-  background(240);
+  //background(240);
 
   const cx = width / 2;
   const bottomY = height - 18;
@@ -53,11 +53,6 @@ function draw() {
   drawTinted(maskIris, pal.iris, cx, bottomY, s);
 
   drawOutline(cx, bottomY, s);
-
-  noStroke();
-  fill(30);
-  textSize(14);
-  text(selectedFrog ? selectedFrog["Frog name"] : "Select a frog", 20, 25);
 }
 
 
