@@ -269,34 +269,70 @@ function getBiomeFromHabitat(frog) {
 function drawTooltip(x, y, frog) {
   push();
 
-  const padding = 12;
-  const lineHeight = 18;
+  const padding = 14;
+  const maxWidth = 340;   // maximum tooltip width
+  const lineSpacing = 18;
 
-  // Convert frog object into readable lines
-  const lines = Object.entries(frog).map(
-    ([key, value]) => `${key}: ${value}`
-  );
+  textSize(14);
+  textAlign(LEFT, TOP);
 
-  const boxWidth = 320;
-  const boxHeight = padding * 2 + lines.length * lineHeight;
+  // Exclude rendering-only color keys
+  const excludedKeys = [
+    "Back color",
+    "Belly color",
+    "Feet color",
+    "Toe color",
+    "Eye color",
+    "Iris color",
+    "Spot color",
+    "Line color"
+  ];
+
+  const entries = Object.entries(frog)
+    .filter(([key]) => !excludedKeys.includes(key));
+
+  // Build wrapped lines
+  let wrappedLines = [];
+
+  for (let [key, value] of entries) {
+    let fullText = `${key}: ${value}`;
+
+    // Wrap text to fit inside maxWidth
+    let words = fullText.split(" ");
+    let currentLine = "";
+
+    for (let word of words) {
+      let testLine = currentLine + word + " ";
+      if (textWidth(testLine) > maxWidth - padding * 2) {
+        wrappedLines.push(currentLine);
+        currentLine = word + " ";
+      } else {
+        currentLine = testLine;
+      }
+    }
+
+    wrappedLines.push(currentLine);
+  }
+
+  // Calculate dynamic height
+  const boxHeight = padding * 2 + wrappedLines.length * lineSpacing;
+  const boxWidth = maxWidth;
 
   // Keep tooltip inside screen
   if (x + boxWidth > width) x = width - boxWidth - 10;
   if (y + boxHeight > height) y = height - boxHeight - 10;
 
   // Background box
-  fill(0, 180);
+  fill(0, 190);
   stroke(255);
-  rect(x, y, boxWidth, boxHeight, 10);
+  rect(x, y, boxWidth, boxHeight, 12);
 
-  // Text
+  // Draw text
   noStroke();
   fill(255);
-  textSize(14);
-  textAlign(LEFT, TOP);
 
-  for (let i = 0; i < lines.length; i++) {
-    text(lines[i], x + padding, y + padding + i * lineHeight);
+  for (let i = 0; i < wrappedLines.length; i++) {
+    text(wrappedLines[i], x + padding, y + padding + i * lineSpacing);
   }
 
   pop();
