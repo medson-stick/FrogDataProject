@@ -2,6 +2,8 @@ let selectedFrog = null;
 let selectedSize = 5;
 let selectedBiome = null;
 let selectedPalette = null;
+let frogBounds = null; // stores frog hitbox
+let showTooltip = false;
 
 // Images
 let outlineImg;
@@ -75,6 +77,31 @@ function draw() {
 
   const pal = selectedPalette;
 
+  // Calculate frog bounding box
+    const frogW = CROP.sw * s;
+    const frogH = CROP.sh * s;
+
+    frogBounds = {
+      left: cx - frogW / 2,
+      right: cx + frogW / 2,
+      top: bottomY - frogH,
+      bottom: bottomY
+    };
+
+    // Detect hover
+    showTooltip = false;
+
+    if (selectedFrog) {
+      if (
+        mouseX >= frogBounds.left &&
+        mouseX <= frogBounds.right &&
+        mouseY >= frogBounds.top &&
+        mouseY <= frogBounds.bottom
+      ) {
+        showTooltip = true;
+      }
+    }
+
   // Draw masks (tinted)
   drawTinted(maskBack, pal.back, cx, bottomY, s);
   drawTinted(maskBelly, pal.belly, cx, bottomY, s);
@@ -90,6 +117,10 @@ function draw() {
   
   
   drawOutline(cx, bottomY, s);
+  
+  if (showTooltip && selectedFrog) {
+  drawTooltip(mouseX + 15, mouseY + 15, selectedFrog);
+}
 }
 
 
@@ -233,4 +264,40 @@ function getBiomeFromHabitat(frog) {
   }
 
   return "rainforests";
+}
+
+function drawTooltip(x, y, frog) {
+  push();
+
+  const padding = 12;
+  const lineHeight = 18;
+
+  // Convert frog object into readable lines
+  const lines = Object.entries(frog).map(
+    ([key, value]) => `${key}: ${value}`
+  );
+
+  const boxWidth = 320;
+  const boxHeight = padding * 2 + lines.length * lineHeight;
+
+  // Keep tooltip inside screen
+  if (x + boxWidth > width) x = width - boxWidth - 10;
+  if (y + boxHeight > height) y = height - boxHeight - 10;
+
+  // Background box
+  fill(0, 180);
+  stroke(255);
+  rect(x, y, boxWidth, boxHeight, 10);
+
+  // Text
+  noStroke();
+  fill(255);
+  textSize(14);
+  textAlign(LEFT, TOP);
+
+  for (let i = 0; i < lines.length; i++) {
+    text(lines[i], x + padding, y + padding + i * lineHeight);
+  }
+
+  pop();
 }
