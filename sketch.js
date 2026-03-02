@@ -5,6 +5,11 @@ let selectedPalette = null;
 let frogBounds = null; // stores frog hitbox
 let showTooltip = false;
 
+// Vial UI (poison indicator)
+let vialEmptyImg, vialMildImg, vialFullImg;
+let vialBounds = null; // stores vial hitbox
+let showVialTooltip = false;
+
 // Images
 let outlineImg;
 let bgRainforest, bgLowlands, bgSavannah, bgRiver;
@@ -30,6 +35,11 @@ function preload() {
   bgLowlands = loadImage("tropical_lowlands.png");
   bgSavannah = loadImage("savannah.png");
   bgRiver = loadImage("river.png");
+
+  // Poison indicator vials
+  vialEmptyImg = loadImage("vial_empty.png");
+  vialMildImg = loadImage("vial_mild.png");
+  vialFullImg = loadImage("vial_full.png");
 }
 
 function setup() {
@@ -45,12 +55,29 @@ function setup() {
 }
 
 function draw() {
+  // Default screen: white background + frog outline (no colors, no tooltip, no vial)
   if (!selectedFrog) {
-  background(240);
-  return;
+    background(255);
+
+    const cx = width / 2;
+    const bottomY = height - 18;
+
+    // Match sizing logic used in scenes
+    const baseTargetW = min(width * 0.58, 560);
+
+    // Use a reasonable default size so outline matches the other scenes
+    const MIN_CM = 2;   // smallest frog
+    const MAX_CM = 32;  // largest frog
+    const defaultCm = 5;
+
+    const sizeFactor = map(defaultCm, MIN_CM, MAX_CM, 0.35, 1.2, true);
+    const s = (baseTargetW / CROP.sw) * sizeFactor;
+
+    drawOutline(cx, bottomY, s);
+    return;
   }
 
-  const cx = width / 2;
+const cx = width / 2;
   const bottomY = height - 18;
 
   let biome = selectedBiome;
@@ -89,7 +116,8 @@ function draw() {
     };
 
     // Detect hover
-    showTooltip = false;
+  showTooltip = false;
+  showVialTooltip = false;
 
     if (selectedFrog) {
       if (
@@ -121,6 +149,12 @@ function draw() {
   if (showTooltip && selectedFrog) {
   drawTooltip(mouseX + 15, mouseY + 15, selectedFrog);
 }
+
+  // Draw poison vial bottom-right (and its own hover tooltip)
+  drawPoisonVial();
+  if (showVialTooltip && selectedFrog) {
+    drawVialTooltip(selectedFrog);
+  }
 }
 
 
@@ -146,7 +180,23 @@ function setupDropdown() {
   });
 
   dropdown.addEventListener("change", (e) => {
-    const idx = Number(e.target.value);
+    const val = String(e.target.value);
+
+    // Placeholder option ("Select a frog") should reset to default outline screen
+    // (Number("") becomes 0, so we must special-case it)
+    if (!val) {
+      selectedFrog = null;
+      selectedBiome = null;
+      selectedSize = 5;
+      selectedPalette = null;
+      showTooltip = false;
+      showVialTooltip = false;
+      vialBounds = null;
+      frogBounds = null;
+      return;
+    }
+
+    const idx = Number(val);
     selectedFrog = Number.isFinite(idx) ? frogs[idx] ?? null : null;
     selectedBiome = getBiomeFromHabitat(selectedFrog);
     selectedSize = getFrogAverageSize(selectedFrog);
@@ -285,7 +335,8 @@ function drawTooltip(x, y, frog) {
     "Eye color",
     "Iris color",
     "Spot color",
-    "Line color"
+    "Line color",
+    "Is poisonous?"
   ];
 
   const entries = Object.entries(frog)
@@ -333,6 +384,120 @@ function drawTooltip(x, y, frog) {
 
   for (let i = 0; i < wrappedLines.length; i++) {
     text(wrappedLines[i], x + padding, y + padding + i * lineSpacing);
+  }
+
+  pop();
+}
+
+/* -----------------------------
+   Poison vial UI (bottom-right)
+----------------------------- */
+function getPoisonLevel(frog) {
+  const raw = frog ? String(frog["Is poisonous?"] || "").toLowerCase() : "";
+
+  if (raw.includes("mild")) return "mild";
+  if (raw.startsWith("y")) return "poisonous"; // "yes"
+  return "none";
+}
+
+function getPoisonLabel(level, frog) {
+  const raw = frog ? String(frog["Is poisonous?"] || "") : "";
+
+  if (level === "poisonous") return `Poisonous: ${raw || "Yes"}`;
+  if (level === "mild") return `Poisonous: ${raw || "Yes (mild)"}`;
+  return "Poisonous: No";
+}
+
+function drawPoisonVial() {
+  if (!selectedFrog) return;
+
+  const level = getPoisonLevel(selectedFrog);
+
+  let img = vialEmptyImg;
+  if (level === "mild") img = vialMildImg;
+  else if (level === "poisonous") img = vialFullImg;
+
+  const margin = 24;
+  const vialW = 90;
+  const vialH = 90;
+
+  const x = width - margin - vialW;
+  const y = height - margin - vialH;
+
+  vialBounds = { left: x, right: x + vialW, top: y, bottom: y + vialH };
+
+  // Hover check for vial
+  if (
+    mouseX >= vialBounds.left &&
+    mouseX <= vialBounds.right &&
+    mouseY >= vialBounds.top &&
+    mouseY <= vialBounds.bottom
+  ) {
+    showVialTooltip = true;
+  }
+
+  // Draw vial
+  push();
+  noTint();
+  image(img, x, y, vialW, vialH);
+
+  // Optional subtle hover outline
+  if (showVialTooltip) {
+    noFill();
+    stroke(255);
+    strokeWeight(2);
+    rect(x - 6, y - 6, vialW + 12, vialH + 12, 10);
+  }
+  pop();
+}
+
+function drawVialTooltip(frog) {
+  if (!vialBounds || !frog) return;
+
+  const level = getPoisonLevel(frog);
+  const label = getPoisonLabel(level, frog);
+
+  push();
+  textSize(14);
+  textAlign(LEFT, TOP);
+
+  const padding = 12;
+  const maxWidth = 260;
+
+  // Wrap label if needed
+  const words = label.split(" ");
+  let lines = [];
+  let line = "";
+  for (const w of words) {
+    const test = (line + w + " ").trimEnd();
+    if (textWidth(test) > maxWidth - padding * 2 && line.length) {
+      lines.push(line.trimEnd());
+      line = w + " ";
+    } else {
+      line += w + " ";
+    }
+  }
+  if (line.trim().length) lines.push(line.trimEnd());
+
+  const lineH = 18;
+  const boxW = maxWidth;
+  const boxH = padding * 2 + lines.length * lineH;
+
+  // Position tooltip just above-left of the vial, but keep on-screen
+  let x = vialBounds.left - boxW - 12;
+  let y = vialBounds.top - boxH - 12;
+
+  if (x < 10) x = 10;
+  if (y < 10) y = 10;
+
+  fill(0, 190);
+  stroke(255);
+  rect(x, y, boxW, boxH, 12);
+
+  noStroke();
+  fill(255);
+  for (let i = 0; i < lines.length; i++) {
+    text(lines[i], x + padding, y + padding + i * lineH);
   }
 
   pop();
