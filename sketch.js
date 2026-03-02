@@ -348,7 +348,7 @@ function drawHandTooltip(x, y, sizeText) {
 
   const lines = [
     `Frog size: ${sizeText || "N/A"}`,
-    `Hand reference: ${HAND_IN} in (${HAND_CM} cm)`
+    `Hand reference: ${HAND_CM} cm (${HAND_IN} in)`
   ];
 
   const boxH = padding * 2 + lines.length * lineSpacing;
@@ -485,7 +485,8 @@ function drawTooltip(x, y, frog) {
     "Iris color",
     "Spot color",
     "Line color",
-    "Is poisonous?"
+    "Is poisonous?",
+    "Size"
   ];
 
   const entries = Object.entries(frog)
