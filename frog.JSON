@@ -14,7 +14,7 @@
         "Iris color": "#ffffff",
         "Spot color": "#000000",
         "Diet": "Insects and small invertebrates",
-        "Size": "1.5 - 6 cm"
+        "Size": "1.5 - 6 cm (0.6 - 2.4 in)"
     },
     {
         "Frog name": "Goliath Frog",
@@ -30,7 +30,7 @@
         "Eye color": "#2b2213",
         "Iris color": "#ffffff",
         "Diet": "Insects, crustaceans, small fish, mollusks, and small vertebrates (Snakes, bats, and smaller frogs)",
-        "Size": "17 - 32 cm"
+        "Size": "17 - 32 cm (6.7 - 12.6 in)"
     },
     {
         "Frog name": "Red-Eyed Tree Frog",
@@ -46,7 +46,7 @@
         "Eye color": "#f33e17",
         "Iris color": "#131323",
         "Diet": "Insects",
-        "Size": "4 - 9 cm"
+        "Size": "4 - 9 cm (1.6 - 3.5 in)"
     },
     {
         "Frog name": "Glass Frog",
@@ -63,7 +63,7 @@
         "Iris color": "#040507",
         "Spot color": "#e6f04f",
         "Diet": "Insects",
-        "Size": "2 - 3 cm"
+        "Size": "2 - 3 cm (0.8 - 1.2 in)"
     },
     {
         "Frog name": "Emerald Glass Frog",
@@ -80,7 +80,7 @@
         "Iris color": "#060b07",
         "Spot color": "#000000",
         "Diet": "Insects",
-        "Size": "2.1 - 3.1 cm"
+        "Size": "2.1 - 3.1 cm (0.8 - 1.2 in)"
     },
     {
         "Frog name": "Tomato Frog",
@@ -96,7 +96,7 @@
         "Eye color": "#74533b",
         "Iris color": "#07090d",
         "Diet": "Insect, particularlly worms",
-        "Size": "6 - 10.5 cm"
+        "Size": "6 - 10.5 cm (2.4 - 4.1 in)"
     },
     {
         "Frog name": "Surinam Toad",
@@ -112,7 +112,7 @@
         "Eye color": "#373737",
         "Iris color": "#ffffff",
         "Diet": "Small fish, worms, crustaceans, and aquatic invertebrates",
-        "Size": "10 - 20 cm"
+        "Size": "10 - 20 cm (3.9 - 7.9 in)"
     },
     {
         "Frog name": "Mission Golden-eyed Tree Frog (Amazon Milk Frog)",
@@ -128,7 +128,7 @@
         "Eye color": "#f2a04e",
         "Iris color": "#06070b",
         "Diet": "Insects",
-        "Size": "6.4 - 10 cm"
+        "Size": "6.4 - 10 cm (2.5 - 3.9 in)"
     },
     {
         "Frog name": "Giant African Bullfrog (Pixie Frogs)",
@@ -145,7 +145,7 @@
         "Iris color": "#120d13",
         "Line color": "#241d0b",
         "Diet": "Insects, small rodents, birds, reptiles, and other amphibians",
-        "Size": "11.4 - 25 cm"
+        "Size": "11.4 - 25 cm (4.5 - 9.8 in)"
     },
     {
         "Frog name": "Pobblebonk Frog (Eastern Banjo Frog)",
@@ -161,6 +161,6 @@
         "Eye color": "#68433a",
         "Iris color": "#000201",
         "Diet": "Insects, worms, and other small invertebrates",
-        "Size": "5 - 8.7 cm"
+        "Size": "5 - 8.7 cm (2.0 - 3.4 in)"
     }
 ]
