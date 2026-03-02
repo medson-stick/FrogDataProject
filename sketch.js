@@ -10,6 +10,11 @@ let vialEmptyImg, vialMildImg, vialFullImg;
 let vialBounds = null; // stores vial hitbox
 let showVialTooltip = false;
 
+// Hand comparison (top-right)
+let handImg;
+let handPanelBounds = null;
+let showHandTooltip = false;
+
 // Images
 let outlineImg;
 let bgRainforest, bgLowlands, bgSavannah, bgRiver;
@@ -40,6 +45,10 @@ function preload() {
   vialEmptyImg = loadImage("vial_empty.png");
   vialMildImg = loadImage("vial_mild.png");
   vialFullImg = loadImage("vial_full.png");
+
+
+  // Hand (size comparison)
+  handImg = loadImage("hand.png");
 }
 
 function setup() {
@@ -73,6 +82,19 @@ function draw() {
     const sizeFactor = map(defaultCm, MIN_CM, MAX_CM, 0.35, 1.2, true);
     const s = (baseTargetW / CROP.sw) * sizeFactor;
 
+    // Top-right hand size comparison (default)
+    drawHandComparison(defaultCm);
+
+    // Hover tooltip for the hand comparison panel
+    showHandTooltip = false;
+    if (handPanelBounds &&
+        mouseX >= handPanelBounds.left && mouseX <= handPanelBounds.right &&
+        mouseY >= handPanelBounds.top && mouseY <= handPanelBounds.bottom) {
+      showHandTooltip = true;
+      drawHandTooltip(mouseX + 12, mouseY + 12, `${nf(defaultCm,0,1)} cm`);
+    }
+
+
     drawOutline(cx, bottomY, s);
     return;
   }
@@ -92,6 +114,9 @@ const cx = width / 2;
 
   // Get frog size in cm
   const avgSize = selectedSize;
+
+  // Top-right hand size comparison (current frog)
+  drawHandComparison(avgSize);
 
   // Define realistic min/max frog sizes in your dataset
   const MIN_CM = 2;   // smallest frog
@@ -154,6 +179,16 @@ const cx = width / 2;
   drawPoisonVial();
   if (showVialTooltip && selectedFrog) {
     drawVialTooltip(selectedFrog);
+  }
+
+  // Hover tooltip for hand comparison panel (shows JSON Size)
+  showHandTooltip = false;
+  if (handPanelBounds &&
+      mouseX >= handPanelBounds.left && mouseX <= handPanelBounds.right &&
+      mouseY >= handPanelBounds.top && mouseY <= handPanelBounds.bottom) {
+    showHandTooltip = true;
+    const sizeText = String(selectedFrog["Size"] || `${nf(avgSize,0,1)} cm`);
+    drawHandTooltip(mouseX + 12, mouseY + 12, sizeText);
   }
 }
 
@@ -229,6 +264,113 @@ function drawOutline(cx, bottomY, s) {
   pop();
 }
 
+
+/* -----------------------------
+   Hand + Frog Outline comparison (top-right)
+----------------------------- */
+function drawHandComparison(frogCm) {
+  if (!handImg || !outlineImg) return;
+
+  const HAND_CM = 19.3;
+  const margin = 18;
+  const gap = 14;
+
+  // Panel size (responsive)
+  const handH = constrain(height * 0.22, 120, 300);
+  const handW = handH * (handImg.width / handImg.height);
+
+  const ratio = constrain(frogCm / HAND_CM, 0.05, 2.2);
+  const frogH = handH * ratio;
+  const frogW = frogH * (CROP.sw / CROP.sh);
+
+  // Layout (top-right), align bottoms
+  let panelTop = margin;
+  let baseY = panelTop + handH;
+
+  // Avoid dropdown overlap
+  const dropdownEl = document.getElementById("dropdown");
+  if (dropdownEl) {
+    const r = dropdownEl.getBoundingClientRect();
+    const dd = { left: r.left, right: r.right, top: r.top, bottom: r.bottom };
+
+    const handX0 = width - margin - handW;
+    const frogX0 = handX0 - gap - frogW;
+
+    const pLeft0 = Math.min(frogX0, handX0) - 10;
+    const pRight0 = handX0 + handW + 10;
+    const pTop0 = panelTop - 10;
+    const pBottom0 = baseY + 10;
+
+    const overlaps = pLeft0 < dd.right && pRight0 > dd.left && pTop0 < dd.bottom && pBottom0 > dd.top;
+    if (overlaps) {
+      panelTop = dd.bottom + 12;
+      baseY = panelTop + handH;
+    }
+  }
+
+  const handX = width - margin - handW;
+  const handY = panelTop;
+
+  let frogX = handX - gap - frogW;
+  let frogY = baseY - frogH;
+  if (frogX < margin) frogX = margin;
+
+  const panelLeft = min(frogX, handX) - 10;
+  const panelTopRect = panelTop - 10;
+  const panelRight = handX + handW + 10;
+  const panelBottom = baseY + 10;
+
+  handPanelBounds = { left: panelLeft, right: panelRight, top: panelTopRect, bottom: panelBottom };
+
+  push();
+  noTint();
+  noStroke();
+  fill(255, 65);
+  rect(panelLeft, panelTopRect, panelRight - panelLeft, panelBottom - panelTopRect, 12);
+
+  image(outlineImg, frogX, frogY, frogW, frogH);
+  image(handImg, handX, handY, handW, handH);
+  pop();
+}
+
+function drawHandTooltip(x, y, sizeText) {
+  push();
+
+  const HAND_CM = 19.3;
+  const HAND_IN = 7.6;
+
+  const padding = 12;
+  const lineSpacing = 18;
+  const boxW = 310;
+
+  textSize(14);
+  textAlign(LEFT, TOP);
+
+  const lines = [
+    `Frog size: ${sizeText || "N/A"}`,
+    `Hand reference: ${HAND_IN} in (${HAND_CM} cm)`
+  ];
+
+  const boxH = padding * 2 + lines.length * lineSpacing;
+
+  if (x + boxW > width) x = width - boxW - 10;
+  if (y + boxH > height) y = height - boxH - 10;
+  if (x < 10) x = 10;
+  if (y < 10) y = 10;
+
+  fill(0, 200);
+  stroke(255);
+  rect(x, y, boxW, boxH, 12);
+
+  noStroke();
+  fill(255);
+  for (let i = 0; i < lines.length; i++) {
+    text(lines[i], x + padding, y + padding + i * lineSpacing);
+  }
+
+  pop();
+}
+
 /* -----------------------------
    Color parsing (supports 8-digit hex)
 ----------------------------- */
@@ -283,12 +425,19 @@ function parseColor(v, fallback) {
 function getFrogAverageSize(frog) {
   if (!frog || !frog["Size"]) return 5; // default medium size
 
-  const nums = frog["Size"].match(/[\d.]+/g);
+  const raw = String(frog["Size"]);
+  const cmPartMatch = raw.match(/^(.*?\bcm\b)/i);
+  const cmPart = cmPartMatch ? cmPartMatch[1] : raw;
+
+  const nums = cmPart.match(/[\d.]+/g);
   if (!nums || nums.length === 0) return 5;
 
-  const values = nums.map(Number);
+  const values = nums.map(Number).filter((n) => Number.isFinite(n));
+  if (!values.length) return 5;
+
   return values.reduce((a, b) => a + b, 0) / values.length;
 }
+
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
